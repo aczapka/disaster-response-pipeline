@@ -60,6 +60,7 @@ def evaluate_model(model, X_test, Y_test, category_names):
         print(classification_report(
             Y_test[:, i_class],
             Y_pred[:, i_class],
+            zero_division=0
         ))
 
 
