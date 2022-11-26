@@ -20,6 +20,23 @@ nltk.download('stopwords')
 
 
 def load_data(database_filepath):
+    """Loads the data from sqlite database and split it in features and labels.
+
+    Parameters
+    ----------
+    database_filepath : str
+        Path of the database to read.
+
+    Returns
+    -------
+    X : array
+        Features.
+    Y : array
+        Labels.
+    category_names : array
+        Names of the labels.
+
+    """
     engine = create_engine('sqlite:///' + database_filepath)
     df = pd.read_sql_table(table_name='messages_and_categories', con=engine)
     X = df['message'].values
@@ -29,6 +46,22 @@ def load_data(database_filepath):
 
 
 def tokenize(text):
+    """Tokenizes the data.
+
+    Tokenization is done by forcing lower case, removing punctuation,
+    tokenizing, stopowords removal and lemmatization.
+
+    Parameters
+    ----------
+    text : str
+        String to tokenize.
+
+    Returns
+    -------
+    test : str
+        Tokenized string.
+
+    """
     text = text.lower()
     text = re.sub(r"[^a-zA-Z0-9 ]", " ", text)
     text = nltk.tokenize.word_tokenize(text)
@@ -38,6 +71,14 @@ def tokenize(text):
 
 
 def build_model():
+    """Creates the model.
+
+    Returns
+    -------
+    cv_model
+        Sklearn pipeline.
+
+    """
     pipeline = Pipeline([
         ('vect', CountVectorizer(tokenizer=tokenize)),
         ('tfidf', TfidfTransformer()),
@@ -52,6 +93,24 @@ def build_model():
 
 
 def evaluate_model(model, X_test, Y_test, category_names):
+    """Evaluates the modes calculation F1 score for each class.
+
+    Parameters
+    ----------
+    model : sklearn pipeline
+        Model to evaluate.
+    X_test : array
+        Test features.
+    Y_test : array
+        Test lables.
+    category_names : array
+        Label names.
+
+    Returns
+    -------
+    None
+
+    """
     # https://stackoverflow.com/questions/43162506/undefinedmetricwarning-f-score-is-ill-defined-and-being-set-to-0-0-in-labels-wi
     Y_pred = model.predict(X_test)
 
@@ -60,14 +119,30 @@ def evaluate_model(model, X_test, Y_test, category_names):
         print(classification_report(
             Y_test[:, i_class],
             Y_pred[:, i_class],
+            zero_division=0
         ))
 
 
 def save_model(model, model_filepath):
+    """Saves the trained model to a pickle.
+
+    Parameters
+    ----------
+    model : sklearn pipeline
+        Model to save.
+    model_filepath : string
+        Path for the pickle.
+
+    Returns
+    -------
+    None
+
+    """
     pickle.dump(model, open(model_filepath, 'wb'))
 
 
 def main():
+    """Main function."""
     if len(sys.argv) == 3:
         database_filepath, model_filepath = sys.argv[1:]
         print('Loading data...\n    DATABASE: {}'.format(database_filepath))

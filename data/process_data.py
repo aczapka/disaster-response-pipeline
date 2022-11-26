@@ -1,10 +1,27 @@
 import sys
-import os
 import pandas as pd
 from sqlalchemy import create_engine
 
 
 def load_data(messages_filepath, categories_filepath):
+    """Reads the training data from CSV files and creates a dataframe.
+
+    The data is read from two files and merged together.
+    The categories are one-hot encoded.
+
+    Parameters
+    ----------
+    messages_filepath : str
+        Path of the messages CSV.
+    categories_filepath : str
+        Path of the categories CSV.
+
+    Returns
+    -------
+    df : dataframe
+        Dataframe that contains all the data.
+
+    """
     messages = pd.read_csv(messages_filepath, sep=',')
     categories = pd.read_csv(categories_filepath, sep=',')
 
@@ -30,6 +47,19 @@ def load_data(messages_filepath, categories_filepath):
 
 
 def clean_data(df):
+    """This function cleans the data.
+
+    Parameters
+    ----------
+    df : dataframe
+        Input raw dataframe.
+
+    Returns
+    -------
+    df : dataframe
+        Clean dataframe.
+
+    """
     # drop all rows with duplicated id
     df = df.drop_duplicates(subset=['id'], keep=False)
 
@@ -41,11 +71,26 @@ def clean_data(df):
 
 
 def save_data(df, database_filename):
+    """This function saves the data to a sqlite database.
+
+    Parameters
+    ----------
+    df : dataframe
+        Input dataframe to save.
+    database_filename : str
+        Name of the database.
+
+    Returns
+    -------
+    None
+
+    """
     engine = create_engine('sqlite:///' + database_filename)
     df.to_sql('messages_and_categories', engine, index=False)
 
 
 def main():
+    """Main function."""
     if len(sys.argv) == 4:
 
         messages_filepath, categories_filepath, database_filepath = sys.argv[1:]
