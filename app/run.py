@@ -16,6 +16,7 @@ app = Flask(__name__)
 
 
 def tokenize(text):
+    """Function that tokenizes text"""
     tokens = word_tokenize(text)
     lemmatizer = WordNetLemmatizer()
 
@@ -39,6 +40,7 @@ model = joblib.load("../models/classifier.pkl")
 @app.route('/')
 @app.route('/index')
 def index():
+    """Creates the web page"""
     # extract data needed for visuals
     genre_counts = df.groupby('genre').count()['message']
     genre_names = list(genre_counts.index)
@@ -98,6 +100,7 @@ def index():
 # web page that handles user query and displays model results
 @app.route('/go')
 def go():
+    """Run queries in the web"""
     # save user input in query
     query = request.args.get('query', '')
 
@@ -114,6 +117,7 @@ def go():
 
 
 def main():
+    """Main function"""
     app.run(host='0.0.0.0', port=3000, debug=True)
 
 

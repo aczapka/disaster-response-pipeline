@@ -1,6 +1,8 @@
 plotly
 pandas
+numpy
 nltk
 flask
 sklearn
 sqlalchemy
+joblib
